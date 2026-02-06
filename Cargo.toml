@@ -32,4 +32,4 @@ members = [
 ]
 
 [workspace.dependencies]
-bevy = { version = "0.18.0", features = ["derive", "dynamic_linking"] }
+bevy = { version = "0.18.0", features = ["dynamic_linking"] }
