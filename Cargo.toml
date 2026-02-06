@@ -4,7 +4,6 @@ name = "voxel-engine"
 version = "0.1.0"
 
 [dependencies]
-bevy = {version = "0.18.0", features = ["dynamic_linking"]}
 egui = "0.33.3"
 
 [profile.dev]
@@ -31,3 +30,6 @@ members = [
   "tools/asset_compiler",
   "tools/level_packer",
 ]
+
+[workspace.dependencies]
+bevy = { version = "0.18.0", features = ["derive", "dynamic_linking"] }
