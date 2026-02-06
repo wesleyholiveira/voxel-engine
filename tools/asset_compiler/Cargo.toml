@@ -1,0 +1,7 @@
+[package]
+edition = "2021"
+name = "asset_compiler"
+version = "0.1.0"
+
+[dependencies]
+assets = {path = "../../crates/assets"}

@@ -1,0 +1,7 @@
+[package]
+edition = "2021"
+name = "editor-app"
+version = "0.1.0"
+
+[dependencies]
+editor = {path = "../crates/editor"}

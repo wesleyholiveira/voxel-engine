@@ -1,0 +1,33 @@
+[package]
+edition = "2024"
+name = "voxel-engine"
+version = "0.1.0"
+
+[dependencies]
+bevy = {version = "0.18.0", features = ["dynamic_linking"]}
+egui = "0.33.3"
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[workspace]
+members = [
+  "crates/engine",
+  "crates/core",
+  "crates/ecs",
+  "crates/platform",
+  "crates/render",
+  "crates/assets",
+  "crates/audio",
+  "crates/physics",
+  "crates/scene",
+  "crates/editor",
+  "crates/macros",
+  "apps/sandbox",
+  "apps/editor",
+  "tools/asset_compiler",
+  "tools/level_packer",
+]
