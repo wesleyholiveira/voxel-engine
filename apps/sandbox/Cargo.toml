@@ -4,4 +4,4 @@ name = "sandbox"
 version = "0.1.0"
 
 [dependencies]
-engine = {path = "../crates/engine"}
+engine = {path = "../../crates/engine"}

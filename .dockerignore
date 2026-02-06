@@ -1,0 +1,9 @@
+target
+**/target
+**/.git
+**/.idea
+**/node_modules
+.dockerignore
+Dockerfile
+docker-compose.yml
+**/*.rs.bk

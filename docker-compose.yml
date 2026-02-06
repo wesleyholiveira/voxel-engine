@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  sandbox:
+    build:
+      context: .
+      args:
+        PACKAGE: sandbox
+    image: voxel-sandbox:latest
+    volumes:
+      - ./assets:/app/assets:ro
+    tty: true
+
+  editor:
+    build:
+      context: .
+      args:
+        PACKAGE: editor-app
+    image: voxel-editor:latest
+    volumes:
+      - ./assets:/app/assets:ro
+    tty: true
+
+# Example: to run a shell inside the built image
+# docker-compose run --rm sandbox sh
