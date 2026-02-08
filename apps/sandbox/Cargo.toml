@@ -7,3 +7,4 @@ version = "0.1.0"
 engine = {path = "../../crates/engine"}
 
 bevy = { workspace = true }
+bevy_egui = { workspace = true }
