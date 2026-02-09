@@ -16,9 +16,9 @@ pub mod terrain {
         pub use voxel::Voxel;
     }
     pub mod generator {
+        mod generator;
         mod heightmap;
         mod noise;
-        mod generator;
 
         pub use generator::TerrainGenerator;
     }

@@ -1,5 +1,3 @@
-pub mod voxel;
-
 #[derive(Component)]
 struct FreeCam {
     sensitivity: f32,
@@ -7,12 +5,14 @@ struct FreeCam {
 }
 
 use bevy::{
-    input::mouse::{MouseMotion, MouseWheel}, prelude::*, render::{
+    input::mouse::{MouseMotion, MouseWheel},
+    prelude::*,
+    render::{
         RenderPlugin,
         settings::{Backends, RenderCreation, WgpuFeatures, WgpuSettings},
-    }
+    },
 };
-use bevy_egui::{egui, EguiContexts, EguiPlugin, EguiPrimaryContextPass};
+use bevy_egui::{EguiContexts, EguiPlugin, EguiPrimaryContextPass, egui};
 
 use engine::debug::spawn_test_chunk;
 
@@ -60,7 +60,6 @@ struct PanOrbitCamera {
     pub radius: f32,
     pub upside_down: bool,
 }
-
 
 fn pan_orbit_camera(
     mut ev_motion: MessageReader<MouseMotion>,
@@ -154,7 +153,7 @@ fn setup(mut commands: Commands) {
     // Camera
     let translation = Vec3::new(-10.0, 20.0, 40.0);
     let focus = Vec3::new(16., 0., 16.);
-    
+
     commands.spawn((
         Camera3d::default(),
         Transform::from_translation(translation).looking_at(focus, Vec3::Y),

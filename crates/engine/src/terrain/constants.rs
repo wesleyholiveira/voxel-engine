@@ -1,7 +1,6 @@
-pub const CHUNK_WIDTH: usize = 16;
-pub const CHUNK_DEPTH: usize = 16;
-pub const CHUNK_HEIGHT: usize = 128;
-
+pub const CHUNK_WIDTH: i32 = 16;
+pub const CHUNK_HEIGHT: i32 = 128;
+pub const CHUNK_DEPTH: i32 = 16;
 
 pub mod noise {
     pub const PERLIN_SCALE: f32 = 0.05;
