@@ -1,16 +1,20 @@
 pub mod voxel;
 
+#[derive(Component)]
+struct FreeCam {
+    sensitivity: f32,
+    speed: f32,
+}
+
 use bevy::{
-    app::TaskPoolThreadAssignmentPolicy,
-    prelude::*,
-    render::{
+    input::mouse::{MouseMotion, MouseWheel}, prelude::*, render::{
         RenderPlugin,
         settings::{Backends, RenderCreation, WgpuFeatures, WgpuSettings},
-    },
+    }
 };
 use bevy_egui::{egui, EguiContexts, EguiPlugin, EguiPrimaryContextPass};
 
-use voxel::voxel::create_cube_mesh;
+use engine::debug::spawn_test_chunk;
 
 fn draw_grid(mut gizmos: Gizmos) {
     let cell_count = UVec2::new(20, 20);
@@ -50,6 +54,69 @@ fn tweak_camera(mut query: Query<&mut Projection, With<Camera>>) {
     }
 }
 
+#[derive(Component)]
+struct PanOrbitCamera {
+    pub focus: Vec3,
+    pub radius: f32,
+    pub upside_down: bool,
+}
+
+
+fn pan_orbit_camera(
+    mut ev_motion: MessageReader<MouseMotion>,
+    mut ev_scroll: MessageReader<MouseWheel>,
+    mouse_input: Res<ButtonInput<MouseButton>>,
+    mut query: Query<(&mut Transform, &mut PanOrbitCamera)>,
+) {
+    let mut rotation_move = Vec2::ZERO;
+    let mut pan = Vec2::ZERO;
+    let mut scroll = 0.0;
+
+    for ev in ev_motion.read() {
+        if mouse_input.pressed(MouseButton::Right) {
+            rotation_move += ev.delta;
+        } else if mouse_input.pressed(MouseButton::Middle) {
+            pan += ev.delta;
+        }
+    }
+
+    for ev in ev_scroll.read() {
+        scroll += ev.y;
+    }
+
+    for (mut transform, mut orbit) in &mut query {
+        // --- Zoom ---
+        if scroll.abs() > 0.0 {
+            orbit.radius -= scroll * orbit.radius * 0.2;
+            orbit.radius = orbit.radius.clamp(2.0, 500.0);
+        }
+
+        // --- Orbit ---
+        if rotation_move.length_squared() > 0.0 {
+            let delta_x = rotation_move.x * 0.005;
+            let delta_y = rotation_move.y * 0.005;
+
+            let yaw = Quat::from_rotation_y(-delta_x);
+            let pitch = Quat::from_rotation_x(-delta_y);
+
+            transform.rotation = yaw * transform.rotation;
+            transform.rotation = transform.rotation * pitch;
+        }
+
+        // --- Pan ---
+        if pan.length_squared() > 0.0 {
+            let right = transform.rotation * Vec3::X * -pan.x * 0.01;
+            let up = transform.rotation * Vec3::Y * pan.y * 0.01;
+            orbit.focus += right + up;
+        }
+
+        // --- Update Transform ---
+        let rot_matrix = Mat3::from_quat(transform.rotation);
+        transform.translation =
+            orbit.focus + rot_matrix.mul_vec3(Vec3::new(0.0, 0.0, orbit.radius));
+    }
+}
+
 fn ui_example_system(mut contexts: EguiContexts) -> Result {
     egui::Window::new("Hello").show(contexts.ctx_mut()?, |ui| {
         ui.label("world");
@@ -59,61 +126,47 @@ fn ui_example_system(mut contexts: EguiContexts) -> Result {
 
 fn main() {
     App::new()
-        .add_plugins((
-            DefaultPlugins
-                .set(RenderPlugin {
-                    render_creation: RenderCreation::Automatic(WgpuSettings {
-                        backends: Some(Backends::PRIMARY | Backends::GL),
-                        features: WgpuFeatures::POLYGON_MODE_LINE,
-                        ..default()
-                    }),
-                    ..default()
-                })
-                .set(TaskPoolPlugin {
-                    task_pool_options: TaskPoolOptions {
-                        async_compute: TaskPoolThreadAssignmentPolicy {
-                            min_threads: 1,
-                            max_threads: 8,
-                            percent: 0.75,
-                            on_thread_spawn: None,
-                            on_thread_destroy: None,
-                        },
-                        ..default()
-                    },
-                }),
-        ))
-        .add_plugins(EguiPlugin::default())
-        .add_systems(EguiPrimaryContextPass, ui_example_system)
-        .add_systems(Startup, (setup, tweak_camera))
-        .add_systems(
-            Update, draw_grid)
+        .add_plugins(DefaultPlugins.set(RenderPlugin {
+            render_creation: RenderCreation::Automatic(WgpuSettings {
+                backends: Some(Backends::PRIMARY | Backends::GL),
+                features: WgpuFeatures::POLYGON_MODE_LINE,
+                ..default()
+            }),
+            ..default()
+        }))
+        // Note: You can add Egui back here if needed
+        .add_systems(Startup, (setup, spawn_test_chunk)) // Added your chunk system
+        .add_systems(Update, (draw_grid, tweak_camera, pan_orbit_camera))
         .run();
 }
 
-/// set up a simple 3D scene
-fn setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-) {
-    let cube_mesh_handle: Handle<Mesh> = meshes.add(create_cube_mesh());
-    // cube
-    commands.spawn((
-        Mesh3d(cube_mesh_handle),
-        MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
-        Transform::from_xyz(3.0, 0.0, 0.0),
-    ));
-    // light
+fn setup(mut commands: Commands) {
+    // Light
     commands.spawn((
         PointLight {
             shadows_enabled: true,
+            intensity: 10_000_000.0,
             ..default()
         },
-        Transform::from_xyz(4.0, 8.0, 4.0),
+        Transform::from_xyz(4.0, 20.0, 4.0),
     ));
-    // camera
+
+    // Camera
+    let translation = Vec3::new(-10.0, 20.0, 40.0);
+    let focus = Vec3::new(16., 0., 16.);
+    
     commands.spawn((
         Camera3d::default(),
-        Transform::from_xyz(0., 5., 10.).looking_at(Vec3::ZERO, Vec3::Y),
+        Transform::from_translation(translation).looking_at(focus, Vec3::Y),
+        // ADD THIS: The system won't run without this component!
+        PanOrbitCamera {
+            focus,
+            radius: translation.distance(focus),
+            upside_down: false,
+        },
+        FreeCam {
+            sensitivity: 0.003,
+            speed: 20.0,
+        },
     ));
 }

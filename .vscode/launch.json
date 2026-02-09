@@ -5,26 +5,26 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug executable 'voxelrst'",
+            "name": "Debug executable 'voxel-engine'",
             "type": "lldb",
             "request": "launch",
             "preLaunchTask": "rust: cargo build",
             "cargo": {
                 "args": [
                     "run",
-                    "--bin=voxelrst"
+                    "-p=sandbox"
                 ]
             },
             "args": []
         },
         {
-            "name": "Debug unit tests in executable 'voxelrst'",
+            "name": "Debug unit tests in executable 'voxel-engine'",
             "type": "lldb",
             "request": "launch",
             "cargo": {
                 "args": [
                     "test",
-                    "--bin=voxelrst"
+                    "-p=sandbox"
                 ]
             }
         }

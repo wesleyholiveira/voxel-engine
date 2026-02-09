@@ -6,3 +6,6 @@ version = "0.1.0"
 [dependencies]
 core = {path = "../core"}
 ecs = {path = "../ecs"}
+
+bevy = { workspace = true}
+fastnoise2 = {workspace = true}
