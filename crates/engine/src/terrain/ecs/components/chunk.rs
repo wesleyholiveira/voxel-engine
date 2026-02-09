@@ -20,7 +20,7 @@ impl Deref for ChunkCoords {
 
 #[derive(Component)]
 pub struct ChunkData {
-    // Fixed-size, contíguo, sem realocação acidental
+    // Fixed-size array of voxels, stored in xzy order (x changes fastest, then z, then y)
     pub voxels: Box<[Voxel]>,
 }
 
@@ -32,7 +32,6 @@ impl ChunkData {
         }
     }
 
-    /// Layout: X varia mais rápido, depois Z, depois Y
     #[inline]
     pub fn index(x: i32, y: i32, z: i32) -> usize {
         debug_assert!(
@@ -49,7 +48,7 @@ impl ChunkData {
             && (0..CHUNK_DEPTH).contains(&z)
     }
 
-    /// Get "seguro": fora do chunk retorna Air
+    /// Safe get. Does not panic if out of bounds, returns Air instead.
     #[inline]
     pub fn get(&self, x: i32, y: i32, z: i32) -> Voxel {
         if !Self::in_bounds(x, y, z) {
@@ -58,7 +57,7 @@ impl ChunkData {
         self.voxels[Self::index(x, y, z)]
     }
 
-    /// Set "seguro": ignora se estiver fora
+    /// Safe set. Does nothing if out of bounds.
     #[inline]
     pub fn set(&mut self, x: i32, y: i32, z: i32, v: Voxel) {
         if !Self::in_bounds(x, y, z) {
@@ -68,24 +67,19 @@ impl ChunkData {
         self.voxels[i] = v;
     }
 
-    // ---------------------------
-    // Helpers úteis (geração/teste)
-    // ---------------------------
-
-    /// Preenche o chunk inteiro com um voxel (ex: tudo sólido pra teste)
+    /// Fill the entire chunk with a single voxel type. Useful for initialization or resetting.
     #[inline]
     pub fn fill(&mut self, v: Voxel) {
         self.voxels.fill(v);
     }
 
-    /// Atalho comum: limpa tudo pra Air
+    /// Common shorthand to fill with Air, since it's the most common "reset" state
     #[inline]
     pub fn clear_air(&mut self) {
         self.fill(Voxel::Air);
     }
 
-    /// Preenche tudo com Solid até uma certa altura (Y < height)
-    /// Ex: height=32 cria "solo" de 32 blocos de altura.
+    /// Fill with "v" from the bottom up to "height", and Air above.
     pub fn fill_layer_below(&mut self, height: i32, v: Voxel) {
         let h = height.clamp(0, CHUNK_HEIGHT);
 
