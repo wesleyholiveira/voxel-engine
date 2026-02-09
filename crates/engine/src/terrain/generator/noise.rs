@@ -4,14 +4,13 @@ use crate::terrain::constants::noise::*;
 
 pub struct TerrainNoise {
     noise: Perlin,
-    seed: i32,
 }
 
 impl TerrainNoise {
     pub fn new(seed: i32) -> Self {
         let noise = Perlin::new(seed as u32);
 
-        Self { noise, seed }
+        Self { noise }
     }
 
     pub fn sample_2d(&self, x: f32, z: f32) -> f32 {
