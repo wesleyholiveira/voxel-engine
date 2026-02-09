@@ -4,7 +4,7 @@ pub const CHUNK_HEIGHT: usize = 128;
 
 
 pub mod noise {
-    pub const PERLIN_SCALE: f32 = 0.1;
+    pub const PERLIN_SCALE: f32 = 0.05;
     pub const FBM_GAIN: f32 = 0.5;
     pub const FBM_WEIGHTED_STRENGTH: f32 = 0.5;
     pub const FBM_OCTAVES: i32 = 5;

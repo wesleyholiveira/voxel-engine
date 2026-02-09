@@ -8,4 +8,4 @@ core = {path = "../core"}
 ecs = {path = "../ecs"}
 
 bevy = { workspace = true}
-fastnoise2 = {workspace = true}
+noise = {workspace = true}

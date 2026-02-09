@@ -31,5 +31,5 @@ members = [
 [workspace.dependencies]
 bevy = { version = "0.18.0", features = ["dynamic_linking"] }
 bevy_egui = {version = "0.39.1"}
-fastnoise2 = {version = "0.4.0"}
+noise = {version = "0.9.0"}
 
