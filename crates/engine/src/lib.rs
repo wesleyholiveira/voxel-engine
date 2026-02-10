@@ -1,7 +1,7 @@
 pub mod debug {
     mod chunk_gen;
 
-    pub use chunk_gen::spawn_test_chunk;
+    pub use chunk_gen::*;
 }
 
 pub mod terrain {
