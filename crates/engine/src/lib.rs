@@ -23,6 +23,11 @@ pub mod terrain {
         pub use generator::TerrainGenerator;
     }
     pub mod constants;
+    pub mod meshing {
+        pub(crate) mod greedy;
+        pub(crate) mod mesh_data;
+        pub(crate) mod bevy_meshing;
+    }
 }
 
 pub fn init() {

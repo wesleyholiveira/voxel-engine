@@ -17,7 +17,7 @@ impl TerrainGenerator {
         }
     }
 
-    pub fn generate(&self, chunk_coord: ChunkCoords) -> ChunkData {
+    /*pub fn generate(&self, chunk_coord: ChunkCoords) -> ChunkData {
         let len = (CHUNK_WIDTH * CHUNK_DEPTH * CHUNK_HEIGHT) as usize;
         // Since we are IVec2, we ALWAYS fill the same vertical height
         let mut voxels = vec![Voxel::Air; len];
@@ -44,5 +44,15 @@ impl TerrainGenerator {
         ChunkData {
             voxels: voxels.into_boxed_slice(),
         }
+    }*/
+
+    pub fn generate(&self, _chunk_coord: ChunkCoords) -> ChunkData {
+        let mut chunk = ChunkData::new();
+
+        // Dois voxels colados no eixo X
+        chunk.set(8, 8, 8, Voxel::Solid);
+        chunk.set(9, 8, 8, Voxel::Solid);
+
+        chunk
     }
 }

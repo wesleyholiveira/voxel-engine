@@ -48,7 +48,7 @@ fn draw_grid(mut gizmos: Gizmos) {
 fn tweak_camera(mut query: Query<&mut Projection, With<Camera>>) {
     for mut projection in &mut query {
         if let Projection::Perspective(ref mut p) = *projection {
-            p.near = 0.1;
+            p.near = 1.0;
             p.far = 0.2;
         }
     }
