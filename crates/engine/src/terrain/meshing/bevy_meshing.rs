@@ -1,7 +1,7 @@
+use crate::terrain::meshing::mesh_data::MeshData;
 use bevy::asset::RenderAssetUsages;
 use bevy::mesh::{Indices, PrimitiveTopology};
 use bevy::prelude::*;
-use crate::terrain::meshing::mesh_data::MeshData;
 
 pub fn meshdata_to_bevy_mesh(data: MeshData) -> Mesh {
     let mut mesh = Mesh::new(

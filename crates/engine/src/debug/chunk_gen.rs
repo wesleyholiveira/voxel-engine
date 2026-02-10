@@ -2,8 +2,8 @@ use bevy::pbr::wireframe::Wireframe;
 use bevy::prelude::*;
 
 use crate::terrain::constants::{CHUNK_DEPTH, CHUNK_HEIGHT, CHUNK_WIDTH};
-use crate::terrain::generator::TerrainGenerator;
 use crate::terrain::ecs::components::chunk::{Chunk, ChunkCoords, ChunkData};
+use crate::terrain::generator::TerrainGenerator;
 use crate::terrain::meshing::bevy_meshing::meshdata_to_bevy_mesh;
 use crate::terrain::meshing::greedy::greedy_mesh;
 use crate::terrain::types::Voxel;
@@ -25,7 +25,7 @@ pub fn spawn_test_chunk_greedy(
     let bevy_mesh = meshdata_to_bevy_mesh(mesh_data);
 
     info!(
-    "verts={} tris={} indices={}",
+        "verts={} tris={} indices={}",
         debug_mesh.positions.len(),
         debug_mesh.indices.len() / 3,
         debug_mesh.indices.len()
@@ -102,7 +102,7 @@ pub fn spawn_test_chunk(
                                 Transform::from_xyz(x as f32, y as f32, z as f32),
                                 GlobalTransform::default(),
                                 Visibility::default(),
-                                Wireframe::default()
+                                Wireframe::default(),
                             ));
                         }
                     }

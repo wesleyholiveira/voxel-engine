@@ -5,12 +5,15 @@ struct FreeCam {
 }
 
 use bevy::{
-    input::mouse::{MouseMotion, MouseWheel}, pbr::wireframe::WireframePlugin, prelude::*, render::{
-        RenderPlugin,
+    input::mouse::{MouseMotion, MouseWheel},
+    pbr::wireframe::WireframePlugin,
+    prelude::*,
+    render::{
         settings::{Backends, RenderCreation, WgpuFeatures, WgpuSettings},
-    }
+        RenderPlugin,
+    },
 };
-use bevy_egui::{EguiContexts, EguiPlugin, EguiPrimaryContextPass, egui};
+use bevy_egui::{egui, EguiContexts, EguiPlugin, EguiPrimaryContextPass};
 
 use engine::debug::*;
 

@@ -1,5 +1,5 @@
 use crate::terrain::constants::{CHUNK_DEPTH, CHUNK_HEIGHT, CHUNK_WIDTH};
-use crate::terrain::ecs::components::chunk::{ChunkData};
+use crate::terrain::ecs::components::chunk::ChunkData;
 use crate::terrain::meshing::mesh_data::MeshData;
 use crate::terrain::types::Voxel;
 
@@ -33,14 +33,14 @@ pub fn greedy_mesh(chunk: &ChunkData) -> MeshData {
         let axis_len = dims[axis];
 
         // mask é um plano plane_w x plane_h
-        let mut mask: Vec<MaskCell> = vec![None; ( plane_w * plane_h) as usize];
+        let mut mask: Vec<MaskCell> = vec![None; (plane_w * plane_h) as usize];
 
         // varre "entre" células: slice = -1.-1
         // plane = slice+1 é onde o quad fica
         for slice in -1..axis_len {
             // 1) monta máscara 2D
             for j in 0..plane_h {
-                for i in 0.. plane_w {
+                for i in 0..plane_w {
                     let mut x = [0i32; 3];
                     x[u] = i;
                     x[v] = j;
@@ -55,7 +55,11 @@ pub fn greedy_mesh(chunk: &ChunkData) -> MeshData {
 
                     // pos_side = voxel do "lado da frente" (plane+1)
                     let pos_side = if slice < axis_len - 1 {
-                        chunk.get(x[0] + (axis == 0) as i32, x[1] + (axis == 1) as i32, x[2] + (axis == 2) as i32)
+                        chunk.get(
+                            x[0] + (axis == 0) as i32,
+                            x[1] + (axis == 1) as i32,
+                            x[2] + (axis == 2) as i32,
+                        )
                     } else {
                         Voxel::Air
                     };
@@ -63,8 +67,14 @@ pub fn greedy_mesh(chunk: &ChunkData) -> MeshData {
                     let idx = (i + j * plane_w) as usize;
 
                     mask[idx] = match (is_solid(neg_side), is_solid(pos_side)) {
-                        (true, false) => Some(FaceCell { mat: 1, normal_sign: 1 }),  // face +axis
-                        (false, true) => Some(FaceCell { mat: 1, normal_sign: -1 }), // face -axis
+                        (true, false) => Some(FaceCell {
+                            mat: 1,
+                            normal_sign: 1,
+                        }), // face +axis
+                        (false, true) => Some(FaceCell {
+                            mat: 1,
+                            normal_sign: -1,
+                        }), // face -axis
                         _ => None,
                     };
                 }
@@ -74,7 +84,7 @@ pub fn greedy_mesh(chunk: &ChunkData) -> MeshData {
             let mut j = 0;
             while j < plane_h {
                 let mut i = 0;
-                while i <  plane_w {
+                while i < plane_w {
                     let idx = (i + j * plane_w) as usize;
                     let cell = mask[idx];
 
@@ -86,7 +96,7 @@ pub fn greedy_mesh(chunk: &ChunkData) -> MeshData {
 
                     // largura w
                     let mut w = 1;
-                    while i + w <  plane_w {
+                    while i + w < plane_w {
                         let idx2 = ((i + w) + j * plane_w) as usize;
                         if mask[idx2] == Some(cell) {
                             w += 1;
@@ -132,10 +142,14 @@ pub fn greedy_mesh(chunk: &ChunkData) -> MeshData {
 /// Converte um retângulo (i,j,w,h) no plano do eixo `d` em 2 triângulos
 fn emit_quad(
     out: &mut MeshData,
-    d: usize, u: usize, v: usize,
+    d: usize,
+    u: usize,
+    v: usize,
     plane: i32,
-    i: i32, j: i32,
-    w: i32, h: i32,
+    i: i32,
+    j: i32,
+    w: i32,
+    h: i32,
     normal_sign: i8,
 ) {
     let normal = {
@@ -172,15 +186,9 @@ fn emit_quad(
     }
 
     // UV simples (0..1). Depois você troca por atlas/material.
-    out.uvs.extend_from_slice(&[
-        [0.0, 0.0],
-        [1.0, 0.0],
-        [1.0, 1.0],
-        [0.0, 1.0],
-    ]);
+    out.uvs
+        .extend_from_slice(&[[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]]);
 
-    out.indices.extend_from_slice(&[
-        base, base + 1, base + 2,
-        base, base + 2, base + 3,
-    ]);
+    out.indices
+        .extend_from_slice(&[base, base + 1, base + 2, base, base + 2, base + 3]);
 }

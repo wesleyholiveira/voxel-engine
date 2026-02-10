@@ -24,9 +24,9 @@ pub mod terrain {
     }
     pub mod constants;
     pub mod meshing {
+        pub(crate) mod bevy_meshing;
         pub(crate) mod greedy;
         pub(crate) mod mesh_data;
-        pub(crate) mod bevy_meshing;
     }
 }
 
