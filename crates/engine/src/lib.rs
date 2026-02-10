@@ -1,7 +1,7 @@
 pub mod debug {
     mod chunk_gen;
 
-    pub use chunk_gen::spawn_test_chunk;
+    pub use chunk_gen::*;
 }
 
 pub mod terrain {
@@ -23,6 +23,11 @@ pub mod terrain {
         pub use generator::TerrainGenerator;
     }
     pub mod constants;
+    pub mod meshing {
+        pub(crate) mod bevy_meshing;
+        pub(crate) mod greedy;
+        pub(crate) mod mesh_data;
+    }
 }
 
 pub fn init() {

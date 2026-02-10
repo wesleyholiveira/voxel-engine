@@ -6,15 +6,16 @@ struct FreeCam {
 
 use bevy::{
     input::mouse::{MouseMotion, MouseWheel},
+    pbr::wireframe::WireframePlugin,
     prelude::*,
     render::{
-        RenderPlugin,
         settings::{Backends, RenderCreation, WgpuFeatures, WgpuSettings},
+        RenderPlugin,
     },
 };
-use bevy_egui::{EguiContexts, EguiPlugin, EguiPrimaryContextPass, egui};
+use bevy_egui::{egui, EguiContexts, EguiPlugin, EguiPrimaryContextPass};
 
-use engine::debug::spawn_test_chunk;
+use engine::debug::*;
 
 fn draw_grid(mut gizmos: Gizmos) {
     let cell_count = UVec2::new(20, 20);
@@ -48,7 +49,7 @@ fn draw_grid(mut gizmos: Gizmos) {
 fn tweak_camera(mut query: Query<&mut Projection, With<Camera>>) {
     for mut projection in &mut query {
         if let Projection::Perspective(ref mut p) = *projection {
-            p.near = 0.1;
+            p.near = 1.0;
             p.far = 0.2;
         }
     }
@@ -133,8 +134,9 @@ fn main() {
             }),
             ..default()
         }))
+        .add_plugins(WireframePlugin::default())
         // Note: You can add Egui back here if needed
-        .add_systems(Startup, (setup, spawn_test_chunk)) // Added your chunk system
+        .add_systems(Startup, (setup, spawn_test_chunk, spawn_test_chunk_greedy))
         .add_systems(Update, (draw_grid, tweak_camera, pan_orbit_camera))
         .run();
 }
