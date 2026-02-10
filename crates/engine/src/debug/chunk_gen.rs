@@ -3,7 +3,8 @@ use bevy::prelude::*;
 
 use crate::terrain::constants::{CHUNK_DEPTH, CHUNK_HEIGHT, CHUNK_WIDTH};
 use crate::terrain::ecs::components::chunk::{Chunk, ChunkCoords, ChunkData};
-use crate::terrain::generator::TerrainGenerator;
+use crate::terrain::ecs::resources::voxel::VoxelRegistry;
+use crate::terrain::generator::TerrainManager;
 use crate::terrain::meshing::bevy_meshing::meshdata_to_bevy_mesh;
 use crate::terrain::meshing::greedy::greedy_mesh;
 use crate::terrain::types::Voxel;
@@ -12,15 +13,15 @@ pub fn spawn_test_chunk_greedy(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    registry: ResMut<VoxelRegistry>,
 ) {
-    let generator = TerrainGenerator::new(50);
+    let manager = TerrainManager::new(50, 4, 42);
 
     let coords = ChunkCoords(IVec2::new(-1, 0));
-
-    let chunk_data: ChunkData = generator.generate(coords);
+    let chunk_data: ChunkData = manager.run(coords);
 
     // greedy -> MeshData -> Bevy Mesh
-    let mesh_data = greedy_mesh(&chunk_data);
+    let mesh_data = greedy_mesh(&chunk_data, &registry);
     let debug_mesh = mesh_data.clone(); // Para debug (printar info depois)
     let bevy_mesh = meshdata_to_bevy_mesh(mesh_data);
 
@@ -61,11 +62,11 @@ pub fn spawn_test_chunk(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let generator = TerrainGenerator::new(42);
+    let manager = TerrainManager::new(42, 4, 42);
 
     let coords = ChunkCoords(IVec2::new(0, 0));
 
-    let generated_data: ChunkData = generator.generate(coords);
+    let generated_data: ChunkData = manager.run(coords);
     let voxels_debug = generated_data.voxels.clone(); // debug-only
 
     // offset do chunk no mundo (coords.x = chunk_x, coords.y = chunk_z)

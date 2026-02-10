@@ -2,6 +2,7 @@ use noise::{NoiseFn, Perlin};
 
 use crate::terrain::constants::noise::*;
 
+#[derive(Clone)]
 pub struct TerrainNoise {
     noise: Perlin,
 }

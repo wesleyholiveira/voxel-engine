@@ -17,6 +17,9 @@ use bevy_egui::{egui, EguiContexts, EguiPlugin, EguiPrimaryContextPass};
 
 use engine::debug::*;
 
+// Import TerrainPlugin from your engine or define it if missing
+use engine::terrain::plugins::{TerrainPlugin, TerrainTaskPlugin};
+
 fn draw_grid(mut gizmos: Gizmos) {
     let cell_count = UVec2::new(20, 20);
     let spacing = Vec2::splat(1.0);
@@ -135,9 +138,13 @@ fn main() {
             ..default()
         }))
         .add_plugins(WireframePlugin::default())
+        .add_plugins(TerrainPlugin)
+        .add_plugins(TerrainTaskPlugin)
+        .add_systems(Startup, setup)
+        .add_systems(Update, (tweak_camera, pan_orbit_camera))
         // Note: You can add Egui back here if needed
-        .add_systems(Startup, (setup, spawn_test_chunk, spawn_test_chunk_greedy))
-        .add_systems(Update, (draw_grid, tweak_camera, pan_orbit_camera))
+        //.add_systems(Startup, (setup, spawn_test_chunk, spawn_test_chunk_greedy))
+        //.add_systems(Update, (draw_grid, tweak_camera, pan_orbit_camera))
         .run();
 }
 
