@@ -1,8 +1,8 @@
 use std::ops::Deref;
 
-use bevy::{ecs::component::Component, math::IVec2};
+use bevy::{ecs::component::Component, math::IVec2, tasks::Task};
 
-use crate::terrain::{constants::*, types::Voxel};
+use crate::terrain::{constants::*, meshing::mesh_data::MeshData, types::Voxel};
 
 #[derive(Component)]
 pub struct Chunk;
@@ -28,6 +28,7 @@ impl ChunkData {
     pub fn new() -> Self {
         let len = (CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH) as usize;
         Self {
+            // Initialize with 0 (Assuming 0 is always Air in your Global Palette)
             voxels: vec![Voxel::Air; len].into_boxed_slice(),
         }
     }
@@ -52,25 +53,23 @@ impl ChunkData {
     #[inline]
     pub fn get(&self, x: i32, y: i32, z: i32) -> Voxel {
         if !Self::in_bounds(x, y, z) {
-            return Voxel::Air;
+            return Voxel::Air; 
         }
         self.voxels[Self::index(x, y, z)]
     }
 
     /// Safe set. Does nothing if out of bounds.
     #[inline]
-    pub fn set(&mut self, x: i32, y: i32, z: i32, v: Voxel) {
-        if !Self::in_bounds(x, y, z) {
-            return;
-        }
+    pub fn set(&mut self, x: i32, y: i32, z: i32, pallete: Voxel) {
+        if !Self::in_bounds(x, y, z) { return; }
         let i = Self::index(x, y, z);
-        self.voxels[i] = v;
+        self.voxels[i] = pallete;
     }
 
     /// Fill the entire chunk with a single voxel type. Useful for initialization or resetting.
     #[inline]
-    pub fn fill(&mut self, v: Voxel) {
-        self.voxels.fill(v);
+    pub fn fill(&mut self, pallete: Voxel) {
+        self.voxels.fill(pallete);
     }
 
     /// Common shorthand to fill with Air, since it's the most common "reset" state
@@ -79,17 +78,15 @@ impl ChunkData {
         self.fill(Voxel::Air);
     }
 
-    /// Fill with "v" from the bottom up to "height", and Air above.
-    pub fn fill_layer_below(&mut self, height: i32, v: Voxel) {
-        let h = height.clamp(0, CHUNK_HEIGHT);
+    pub fn fill_layer_below(&mut self, height: i32, pallete: Voxel) {
+        let h = height.clamp(0, CHUNK_HEIGHT) as usize;
+        let layer_size = (CHUNK_WIDTH * CHUNK_DEPTH) as usize;
+        let split_point = h * layer_size;
 
-        for y in 0..CHUNK_HEIGHT {
-            let fill_this_y = y < h;
-            for z in 0..CHUNK_DEPTH {
-                for x in 0..CHUNK_WIDTH {
-                    self.set(x, y, z, if fill_this_y { v } else { Voxel::Air });
-                }
-            }
-        }
+        self.voxels[..split_point].fill(pallete);
+        self.voxels[split_point..].fill(Voxel::Air);
     }
 }
+
+#[derive(Component)]
+pub struct ChunkCompute(pub Task<(ChunkCoords, ChunkData, MeshData)>);
