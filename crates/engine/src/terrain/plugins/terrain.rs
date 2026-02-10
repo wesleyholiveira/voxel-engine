@@ -1,5 +1,6 @@
 use bevy::app::{App, Plugin};
 use std::collections::HashMap;
+use std::thread;
 
 use bevy::prelude::*;
 
@@ -35,7 +36,7 @@ pub struct TerrainTaskPlugin;
 impl Plugin for TerrainTaskPlugin {
     fn build(&self, app: &mut App) {
         // 1. Create the generator with a seed
-        let manager = TerrainManager::new(24, 4, 42); 
+        let manager = TerrainManager::new(64, (thread::available_parallelism().unwrap().get() / 2) as usize, 42); 
 
         // 2. Insert it as a resource so systems can find it
         app.insert_resource(manager);
